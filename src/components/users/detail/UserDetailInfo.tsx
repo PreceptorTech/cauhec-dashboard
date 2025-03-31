@@ -38,19 +38,13 @@ const UserDetailInfo: React.FC<UserDetailInfoProps> = ({ user }) => {
                 </div>
               </>
             )}
-            {user.role === "student" && (
-              <div>
-                <p className="text-sm text-gray-500">Clinical Hours Needed</p>
-                <p className="font-medium">
-                  {user.numberOfClinicalHoursNeeded || "Not specified"}
-                </p>
-              </div>
-            )}
             <div>
               <p className="text-sm text-gray-500">
                 Communication Style/Personality Assessment
               </p>
-              <p className="font-medium">{"Not specified"}</p>
+              <p className="font-medium">
+                {user?.personalityAssessmentCode || "Not specified"}
+              </p>
             </div>
           </div>
         </div>
@@ -102,19 +96,7 @@ const UserDetailInfo: React.FC<UserDetailInfoProps> = ({ user }) => {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <p className="text-sm text-gray-500">Stipend Amount</p>
-              <p className="font-medium">$0.00</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Payment Status</p>
-              <p className="font-medium">Not Started</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Payment Method</p>
-              <p className="font-medium">Not Specified</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Last Payment Date</p>
-              <p className="font-medium">Not Available</p>
+              <p className="font-medium">{user.stipend || "Not specified"}</p>
             </div>
           </div>
         </div>

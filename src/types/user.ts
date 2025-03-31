@@ -49,6 +49,7 @@ export interface UserDetails {
   licenseNumber: string;
   certificationNumber: string;
   subscribeStatus: string;
+  stipend: string;
   verificationId: string;
 }
 
