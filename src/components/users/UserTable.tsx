@@ -1,16 +1,16 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User } from '../../api/users';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { User } from "../../types/user";
 
 interface UserTableProps {
   users: User[];
-  type: 'student' | 'preceptor';
+  type: "student" | "preceptor";
 }
 
 const UserTable: React.FC<UserTableProps> = ({ users, type }) => {
   const navigate = useNavigate();
 
-  const handleRowClick = (id: number) => {
+  const handleRowClick = (id: string) => {
     navigate(`/users/${id}`);
   };
 
@@ -25,7 +25,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, type }) => {
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Email
             </th>
-            {type === 'student' ? (
+            {type === "student" ? (
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 School
               </th>
@@ -41,8 +41,8 @@ const UserTable: React.FC<UserTableProps> = ({ users, type }) => {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {users.map((user) => (
-            <tr 
-              key={user.id} 
+            <tr
+              key={user.id}
               className="hover:bg-gray-50 cursor-pointer"
               onClick={() => handleRowClick(user.id)}
             >
@@ -50,16 +50,15 @@ const UserTable: React.FC<UserTableProps> = ({ users, type }) => {
                 <div className="flex items-center">
                   <div className="h-10 w-10 rounded-full bg-[#FFF1F1] flex items-center justify-center">
                     <span className="text-[#EF5157] font-medium">
-                      {user.firstName[0]}{user.lastName[0]}
+                      {user.firstName[0]}
+                      {user.lastName[0]}
                     </span>
                   </div>
                   <div className="ml-4">
                     <div className="text-sm font-medium text-gray-900">
                       {`${user.firstName} ${user.lastName}`.trim()}
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {user.role}
-                    </div>
+                    <div className="text-sm text-gray-500">{user.role}</div>
                   </div>
                 </div>
               </td>
@@ -67,7 +66,9 @@ const UserTable: React.FC<UserTableProps> = ({ users, type }) => {
                 {user.email}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {type === 'student' ? user.schoolName || 'N/A' : user.workLocation || 'N/A'}
+                {type === "student"
+                  ? user.schoolName || "N/A"
+                  : user.workLocation || "N/A"}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {new Date(user.createdAt).toLocaleDateString()}

@@ -1,5 +1,7 @@
-export type ConnectionRole = 'student' | 'preceptor' | 'coordinator';
-export type ConnectionStatus = 'active' | 'pending' | 'completed' | 'inactive';
+import { User } from "./user";
+
+export type ConnectionRole = "student" | "preceptor" | "coordinator";
+export type ConnectionStatus = "pending" | "accepted" | "ignored";
 
 export interface Connection {
   id: string;
@@ -12,6 +14,8 @@ export interface Connection {
   startDate: string;
   endDate?: string;
   lastActive: string;
+  student: User;
+  preceptor: User;
 }
 
 export interface ConnectionFilter {

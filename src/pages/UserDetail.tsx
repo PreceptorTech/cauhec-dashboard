@@ -1,18 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import UserDetailHeader from '../components/users/detail/UserDetailHeader';
-import UserDetailInfo from '../components/users/detail/UserDetailInfo';
-import DeleteConfirmModal from '../components/profiles/DeleteConfirmModal';
-import { getUserDetail, UserDetailResponse } from '../api/users';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import UserDetailHeader from "../components/users/detail/UserDetailHeader";
+import UserDetailInfo from "../components/users/detail/UserDetailInfo";
+import DeleteConfirmModal from "../components/profiles/DeleteConfirmModal";
+import { getUserDetail } from "../api/users";
+import { UserDetails } from "../types/user";
 
 const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [user, setUser] = useState<UserDetailResponse | null>(null);
+  const [user, setUser] = useState<UserDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deleteModal, setDeleteModal] = useState({ isOpen: false, loading: false });
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    loading: false,
+  });
 
   useEffect(() => {
     const fetchUserDetail = async () => {
@@ -23,8 +27,8 @@ const UserDetailPage: React.FC = () => {
           setUser(data);
         }
       } catch (err) {
-        setError('Failed to load user details');
-        console.error('Error fetching user detail:', err);
+        setError("Failed to load user details");
+        console.error("Error fetching user detail:", err);
       } finally {
         setLoading(false);
       }
@@ -35,22 +39,25 @@ const UserDetailPage: React.FC = () => {
 
   const handleDelete = async () => {
     try {
-      setDeleteModal(prev => ({ ...prev, loading: true }));
-      
-      await axios.delete('https://backend-prod.cauhec.org/api/v1/admin/delete-user', {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        data: {
-          id: Number(id)
-        }
-      });
+      setDeleteModal((prev) => ({ ...prev, loading: true }));
 
-      navigate('/users');
+      await axios.delete(
+        "https://backend-prod.cauhec.org/api/v1/admin/delete-user",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          data: {
+            id: Number(id),
+          },
+        }
+      );
+
+      navigate("/users");
     } catch (err) {
-      setError('Failed to delete user');
-      setDeleteModal(prev => ({ ...prev, loading: false }));
+      setError("Failed to delete user");
+      setDeleteModal((prev) => ({ ...prev, loading: false }));
     }
   };
 
@@ -65,16 +72,16 @@ const UserDetailPage: React.FC = () => {
   if (error || !user) {
     return (
       <div className="bg-red-50 text-red-700 p-4 rounded-lg">
-        {error || 'User not found'}
+        {error || "User not found"}
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <UserDetailHeader 
-        user={user} 
-        onDelete={() => setDeleteModal({ isOpen: true, loading: false })} 
+      <UserDetailHeader
+        user={user}
+        onDelete={() => setDeleteModal({ isOpen: true, loading: false })}
       />
       <UserDetailInfo user={user} />
 

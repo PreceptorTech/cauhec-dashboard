@@ -53,7 +53,6 @@ function AppRoutes() {
       >
         <Route index element={<Dashboard />} />
         <Route path="/connections" element={<Connections />} />
-        <Route path="/connections/:id" element={<ConnectionDetail />} />
         <Route path="/institutions" element={<Institutions />} />
         <Route path="/users" element={<Users />} />
         <Route path="/users/:id" element={<UserDetail />} />

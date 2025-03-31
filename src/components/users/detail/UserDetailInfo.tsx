@@ -1,9 +1,8 @@
-import React from 'react';
-import { UserDetail } from '../../../types/userDetail';
-import { Briefcase, Award, GraduationCap, Clock, Building2 } from 'lucide-react';
+import React from "react";
+import { UserDetails } from "../../../types/user";
 
 interface UserDetailInfoProps {
-  user: UserDetail;
+  user: UserDetails;
 }
 
 const UserDetailInfo: React.FC<UserDetailInfoProps> = ({ user }) => {
@@ -11,54 +10,112 @@ const UserDetailInfo: React.FC<UserDetailInfoProps> = ({ user }) => {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold mb-4">Professional Information</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            Professional Information
+          </h2>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-sm text-gray-500">Clinical Role</p>
-              <p className="font-medium">{user.clinicalRole || 'Not specified'}</p>
+              <p className="text-sm text-gray-500">
+                {user.role === "preceptor" ? "Clinical Role" : "Major"}
+              </p>
+              <p className="font-medium">
+                {user.majorClinicalProgramType || "Not specified"}
+              </p>
             </div>
+            {user.role === "preceptor" && (
+              <>
+                <div>
+                  <p className="text-sm text-gray-500">Experience</p>
+                  <p className="font-medium">
+                    {user.experience || "Not specified"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Specialty</p>
+                  <p className="font-medium">
+                    {user.specialty || "Not specified"}
+                  </p>
+                </div>
+              </>
+            )}
+            {user.role === "student" && (
+              <div>
+                <p className="text-sm text-gray-500">Clinical Hours Needed</p>
+                <p className="font-medium">
+                  {user.numberOfClinicalHoursNeeded || "Not specified"}
+                </p>
+              </div>
+            )}
             <div>
-              <p className="text-sm text-gray-500">Experience</p>
-              <p className="font-medium">{user.experience || 'Not specified'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Specialty</p>
-              <p className="font-medium">{user.specialty || 'Not specified'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Clinical Hours Needed</p>
-              <p className="font-medium">{user.numberOfClinicalHoursNeeded || 'Not specified'}</p>
+              <p className="text-sm text-gray-500">
+                Communication Style/Personality Assessment
+              </p>
+              <p className="font-medium">{"Not specified"}</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold mb-4">Education & Certification</h2>
+          <h2 className="text-lg font-semibold mb-4">
+            {user.role === "preceptor"
+              ? "License & Certification"
+              : "School Information"}
+          </h2>
           <div className="grid grid-cols-2 gap-6">
-            {user.role === 'preceptor' && (
+            {user.role === "preceptor" && (
               <>
                 <div>
                   <p className="text-sm text-gray-500">License Number</p>
-                  <p className="font-medium">{user.licenseNumber || 'Not provided'}</p>
+                  <p className="font-medium">
+                    {user?.licenseNumber || "Not provided"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Certification Number</p>
-                  <p className="font-medium">{user.certificationNumber || 'Not provided'}</p>
+                  <p className="font-medium">
+                    {user.certificationNumber || "Not provided"}
+                  </p>
                 </div>
               </>
             )}
-            {user.role === 'student' && (
+            {user.role === "student" && (
               <>
                 <div>
                   <p className="text-sm text-gray-500">School Name</p>
-                  <p className="font-medium">{user.schoolName || 'Not provided'}</p>
+                  <p className="font-medium">
+                    {user.schoolName || "Not provided"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">School Location</p>
-                  <p className="font-medium">{user.schoolLocation || 'Not provided'}</p>
+                  <p className="font-medium">
+                    {user.schoolLocation || "Not provided"}
+                  </p>
                 </div>
               </>
             )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold mb-4">Stipend Information</h2>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <p className="text-sm text-gray-500">Stipend Amount</p>
+              <p className="font-medium">$0.00</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Payment Status</p>
+              <p className="font-medium">Not Started</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Payment Method</p>
+              <p className="font-medium">Not Specified</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Last Payment Date</p>
+              <p className="font-medium">Not Available</p>
+            </div>
           </div>
         </div>
       </div>
@@ -75,15 +132,17 @@ const UserDetailInfo: React.FC<UserDetailInfoProps> = ({ user }) => {
               <p className="text-sm text-gray-500">Verification ID</p>
               <p className="font-medium">{user.verificationId}</p>
             </div>
-            {user.role === 'preceptor' && (
+            {user.role === "preceptor" && (
               <div>
                 <p className="text-sm text-gray-500">Preceptor Status</p>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  user.preceptorStatus === 1 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {user.preceptorStatus === 1 ? 'Active' : 'Pending'}
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    user.preceptorStatus === "Yes"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}
+                >
+                  {user.preceptorStatus === "Yes" ? "Active" : "Pending"}
                 </span>
               </div>
             )}
@@ -97,12 +156,12 @@ const UserDetailInfo: React.FC<UserDetailInfoProps> = ({ user }) => {
               <p className="text-sm text-gray-500">Personality Assessment</p>
               <p className="font-medium">{user.personalityAssessmentCode}</p>
             </div>
-            {user.linkedinUrl && (
+            {user.Linkdin_url && (
               <div>
                 <p className="text-sm text-gray-500">LinkedIn Profile</p>
-                <a 
-                  href={user.linkedinUrl} 
-                  target="_blank" 
+                <a
+                  href={user.Linkdin_url}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-indigo-600 hover:text-indigo-800"
                 >

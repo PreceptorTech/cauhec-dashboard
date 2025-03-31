@@ -1,26 +1,28 @@
-import axiosInstance from './axiosConfig';
-import { User, UserDetailResponse } from '../types/user';
+import axiosInstance from "./axiosConfig";
+import { User, UserDetails } from "../types/user";
 
-export const getUsers = async (role: 'student' | 'preceptor'): Promise<User[]> => {
+export const getUsers = async (
+  role: "student" | "preceptor"
+): Promise<User[]> => {
   try {
-    const response = await axiosInstance.get('/admin/users-list', {
-      params: { role }
+    const response = await axiosInstance.get("/admin/users-list", {
+      params: { role },
     });
     return response.data.data;
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error("Error fetching users:", error);
     throw error;
   }
 };
 
-export const getUserDetail = async (id: string): Promise<UserDetailResponse> => {
+export const getUserDetail = async (id: string): Promise<UserDetails> => {
   try {
-    const response = await axiosInstance.get('/admin/view-user', {
-      params: { id }
+    const response = await axiosInstance.get("/admin/view-user", {
+      params: { id },
     });
     return response.data.data;
   } catch (error) {
-    console.error('Error fetching user detail:', error);
+    console.error("Error fetching user detail:", error);
     throw error;
   }
 };
