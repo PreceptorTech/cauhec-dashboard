@@ -26,3 +26,22 @@ export const getUserDetail = async (id: string): Promise<UserDetails> => {
     throw error;
   }
 };
+
+export const uploadCsv = async (file: File): Promise<string> => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file, file.name);
+
+    const response = await axiosInstance.post("/public/csvupload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to upload CSV: ${error.message}`);
+    }
+    throw new Error("Failed to upload CSV");
+  }
+};
