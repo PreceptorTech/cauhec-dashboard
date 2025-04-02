@@ -24,7 +24,8 @@ const UserDetailHeader: React.FC<UserDetailHeaderProps> = ({
         </Link>
         <button
           onClick={onDelete}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          disabled
+          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg opacity-50 cursor-not-allowed"
         >
           <Trash2 className="w-5 h-5" />
           Delete User

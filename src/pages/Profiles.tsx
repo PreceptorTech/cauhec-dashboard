@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Trash2, Plus } from 'lucide-react';
-import { getProfiles } from '../api/profiles';
-import { Profile } from '../types/profile';
-import CreateAdminModal from '../components/profiles/CreateAdminModal';
-import DeleteConfirmModal from '../components/profiles/DeleteConfirmModal';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Trash2, Plus } from "lucide-react";
+import { getProfiles } from "../api/profiles";
+import { Profile } from "../types/profile";
+import CreateAdminModal from "../components/profiles/CreateAdminModal";
+import DeleteConfirmModal from "../components/profiles/DeleteConfirmModal";
+import axios from "axios";
 
 const Profiles: React.FC = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [deleteModalData, setDeleteModalData] = useState<{ isOpen: boolean; id: number | null; loading: boolean }>({
+  const [deleteModalData, setDeleteModalData] = useState<{
+    isOpen: boolean;
+    id: number | null;
+    loading: boolean;
+  }>({
     isOpen: false,
     id: null,
-    loading: false
+    loading: false,
   });
 
   const fetchProfiles = async () => {
@@ -24,7 +28,7 @@ const Profiles: React.FC = () => {
       const data = await getProfiles();
       setProfiles(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load profiles');
+      setError(err instanceof Error ? err.message : "Failed to load profiles");
     } finally {
       setLoading(false);
     }
@@ -38,31 +42,35 @@ const Profiles: React.FC = () => {
     if (!deleteModalData.id) return;
 
     try {
-      setDeleteModalData(prev => ({ ...prev, loading: true }));
-      
-      await axios.delete('https://backend-prod.cauhec.org/api/v1/admin/delete-admin-user', {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        data: {
-          id: deleteModalData.id
+      setDeleteModalData((prev) => ({ ...prev, loading: true }));
+
+      await axios.delete(
+        "https://backend-prod.cauhec.org/api/v1/admin/delete-admin-user",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          data: {
+            id: deleteModalData.id,
+          },
         }
-      });
+      );
 
       await fetchProfiles();
       setDeleteModalData({ isOpen: false, id: null, loading: false });
     } catch (err) {
-      setError('Failed to delete admin');
-      setDeleteModalData(prev => ({ ...prev, loading: false }));
+      setError("Failed to delete admin");
+      setDeleteModalData((prev) => ({ ...prev, loading: false }));
     }
   };
 
   const getInitials = (name: string | undefined) => {
-    if (!name) return 'U';
-    return name.split(' ')
-      .map(n => n[0])
-      .join('')
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
       .toUpperCase();
   };
 
@@ -79,7 +87,9 @@ const Profiles: React.FC = () => {
       <div className="mb-6 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Profiles</h1>
-          <p className="text-gray-500 mt-1">Manage user profiles and credentials</p>
+          <p className="text-gray-500 mt-1">
+            Manage user profiles and credentials
+          </p>
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
@@ -134,8 +144,15 @@ const Profiles: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <button
-                    onClick={() => setDeleteModalData({ isOpen: true, id: profile.id, loading: false })}
-                    className="text-red-600 hover:text-red-800"
+                    onClick={() =>
+                      setDeleteModalData({
+                        isOpen: true,
+                        id: profile.id,
+                        loading: false,
+                      })
+                    }
+                    className="text-gray-400 cursor-not-allowed"
+                    disabled
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
@@ -154,7 +171,9 @@ const Profiles: React.FC = () => {
 
       <DeleteConfirmModal
         isOpen={deleteModalData.isOpen}
-        onClose={() => setDeleteModalData({ isOpen: false, id: null, loading: false })}
+        onClose={() =>
+          setDeleteModalData({ isOpen: false, id: null, loading: false })
+        }
         onConfirm={handleDelete}
         loading={deleteModalData.loading}
       />
