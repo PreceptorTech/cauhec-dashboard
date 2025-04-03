@@ -11,6 +11,19 @@ const ConnectionTable: React.FC<ConnectionTableProps> = ({ connections }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "accepted":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "ignored":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   const handleRowClick = (id: string) => {
     navigate(`/connections/${id}`);
   };
@@ -42,6 +55,9 @@ const ConnectionTable: React.FC<ConnectionTableProps> = ({ connections }) => {
               Preceptor Name
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Connection Requested Date
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -54,6 +70,7 @@ const ConnectionTable: React.FC<ConnectionTableProps> = ({ connections }) => {
             <tr
               key={connection.id}
               className="hover:bg-gray-50 cursor-pointer"
+              onClick={() => handleRowClick(connection.id)}
             >
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
@@ -98,6 +115,15 @@ const ConnectionTable: React.FC<ConnectionTableProps> = ({ connections }) => {
                     </div>
                   </div>
                 </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    connection.status
+                  )}`}
+                >
+                  {connection.status.toUpperCase()}
+                </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {new Date(connection.startDate).toLocaleDateString()}

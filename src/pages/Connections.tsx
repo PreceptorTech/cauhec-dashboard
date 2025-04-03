@@ -6,7 +6,7 @@ import { Connection, ConnectionFilter } from "../types/connection";
 import { getAllConnections } from "../api/connections";
 
 const Connections: React.FC = () => {
-  const [filters, setFilters] = useState<ConnectionFilter>({ role: "student" });
+  const [filter, setFilter] = useState<string>("pending");
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +24,14 @@ const Connections: React.FC = () => {
     };
 
     fetchConnections();
-  }, [filters.role]);
+  }, [filter]);
+
+  const filteredConnections = connections.filter((connection) => {
+    if (filter && connection.status !== filter) {
+      return false;
+    }
+    return true;
+  });
 
   if (loading) {
     return (
@@ -56,7 +63,8 @@ const Connections: React.FC = () => {
   return (
     <div>
       <ConnectionHeader />
-      <ConnectionTable connections={connections} />
+      <ConnectionFilters filter={filter} onFilterChange={setFilter} />
+      <ConnectionTable connections={filteredConnections} />
     </div>
   );
 };

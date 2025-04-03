@@ -19,8 +19,5 @@ export interface Connection {
 }
 
 export interface ConnectionFilter {
-  role?: ConnectionRole;
   status?: ConnectionStatus;
-  institution?: string;
-  program?: string;
 }

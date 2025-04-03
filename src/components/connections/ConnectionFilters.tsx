@@ -1,13 +1,15 @@
-import React from 'react';
-import { Filter } from 'lucide-react';
-import { ConnectionFilter, ConnectionRole } from '../../types/connection';
+import React from "react";
+import { Filter } from "lucide-react";
 
 interface ConnectionFiltersProps {
-  filters: ConnectionFilter;
-  onFilterChange: (filters: ConnectionFilter) => void;
+  filter: string;
+  onFilterChange: (filter: string) => void;
 }
 
-const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({ filters, onFilterChange }) => {
+const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({
+  filter,
+  onFilterChange,
+}) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       <div className="flex flex-wrap items-center gap-4">
@@ -15,14 +17,15 @@ const ConnectionFilters: React.FC<ConnectionFiltersProps> = ({ filters, onFilter
           <Filter className="w-5 h-5 text-gray-500" />
           <span className="font-medium">Filters</span>
         </div>
-        
-        <select 
+
+        <select
           className="rounded-md border-gray-300 text-sm"
-          value={filters.role}
-          onChange={(e) => onFilterChange({ ...filters, role: e.target.value as ConnectionRole })}
+          value={filter}
+          onChange={(e) => onFilterChange(e.target.value)}
         >
-          <option value="student">Students</option>
-          <option value="preceptor">Preceptors</option>
+          <option value="pending">Pending</option>
+          <option value="accepted">Accepted</option>
+          <option value="ignored">Ignored</option>
         </select>
       </div>
     </div>
