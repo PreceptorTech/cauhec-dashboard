@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import UserHeader from "../components/users/UserHeader";
 import UserTabs from "../components/users/UserTabs";
 import UserTable from "../components/users/UserTable";
@@ -10,7 +10,17 @@ const Users: React.FC = () => {
     "student"
   );
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filterUsers = useCallback((users: User[], query: string) => {
+    if (!query) return users;
+    const lowerQuery = query.toLowerCase();
+    return users.filter((user) =>
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(lowerQuery)
+    );
+  }, []);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -18,6 +28,7 @@ const Users: React.FC = () => {
         setLoading(true);
         const data = await getUsers(activeTab);
         setUsers(data);
+        setFilteredUsers(filterUsers(data, searchQuery));
       } catch (error) {
         console.error("Failed to fetch users:", error);
       } finally {
@@ -26,11 +37,16 @@ const Users: React.FC = () => {
     };
 
     fetchUsers();
-  }, [activeTab]);
+  }, [activeTab, filterUsers, searchQuery]);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setFilteredUsers(filterUsers(users, query));
+  };
 
   return (
     <div>
-      <UserHeader activeTab={activeTab} />
+      <UserHeader activeTab={activeTab} onSearch={handleSearch} />
       <UserTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
       {loading ? (
@@ -38,7 +54,7 @@ const Users: React.FC = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#EF5157]"></div>
         </div>
       ) : (
-        <UserTable users={users} type={activeTab} />
+        <UserTable users={filteredUsers} type={activeTab} />
       )}
     </div>
   );

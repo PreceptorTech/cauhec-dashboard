@@ -1,18 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../types/user";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 interface UserTableProps {
   users: User[];
   type: "student" | "preceptor";
 }
 
+type SortDirection = "asc" | "desc" | null;
+
 const UserTable: React.FC<UserTableProps> = ({ users, type }) => {
   const navigate = useNavigate();
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   const handleRowClick = (id: string) => {
     navigate(`/users/${id}`);
   };
+
+  const handleSort = () => {
+    setSortDirection((prev) => {
+      if (prev === null) return "asc";
+      if (prev === "asc") return "desc";
+      return null;
+    });
+  };
+
+  const sortedUsers = [...users].sort((a, b) => {
+    if (sortDirection === null) return 0;
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+  });
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -34,13 +53,22 @@ const UserTable: React.FC<UserTableProps> = ({ users, type }) => {
                 Work Location
               </th>
             )}
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Join Date
+            <th
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+              onClick={handleSort}
+            >
+              <div className="flex items-center gap-1">
+                Join Date
+                {sortDirection === "asc" && <ChevronUp className="h-4 w-4" />}
+                {sortDirection === "desc" && (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </div>
             </th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {users.map((user) => (
+          {sortedUsers.map((user) => (
             <tr
               key={user.id}
               className="hover:bg-gray-50 cursor-pointer"
