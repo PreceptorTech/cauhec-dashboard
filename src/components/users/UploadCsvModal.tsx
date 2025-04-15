@@ -1,23 +1,70 @@
-import React, { useState, useRef } from "react";
-import { X, Upload, FileText, CheckCircle } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { X, Upload, FileText, CheckCircle, Clock } from "lucide-react";
 import { uploadCsv } from "../../api/users";
+import {
+  initializeSocket,
+  loginUser,
+  onUploadComplete,
+} from "../../api/socketConfig";
+import { useAuth } from "../../context/AuthContext";
 
 interface UploadCsvModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+interface UploadStats {
+  totalProcessed: number;
+  totalSuccess: number;
+  totalFailed: number;
+  failedEmails: string[];
+  successEmails: string[];
+  alreadyExistEmails: string[];
+}
+
 const UploadCsvModal: React.FC<UploadCsvModalProps> = ({ isOpen, onClose }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [inProgress, setInProgress] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [uploadStats, setUploadStats] = useState<UploadStats | null>(null);
+  const [activeTab, setActiveTab] = useState<"failed" | "success" | "existing">(
+    "failed"
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const user = useAuth();
+
+  useEffect(() => {
+    initializeSocket("https://backend-prod.cauhec.org");
+    loginUser(user?.user?.id);
+  }, []);
+
+  useEffect(() => {
+    if (inProgress) {
+      onUploadComplete((data) => {
+        console.log("upload complete", data);
+        setIsSuccess(true);
+        setIsUploading(false);
+        setInProgress(false);
+        setUploadStats({
+          totalProcessed: data.totalProcessed,
+          totalSuccess: data.totalSuccess,
+          totalFailed: data.totalFailed,
+          failedEmails: data.failedEmails || [],
+          successEmails: data.successEmails || [],
+          alreadyExistEmails: data.alreadyExistEmails || [],
+        });
+      });
+    }
+  }, [inProgress]);
 
   const handleClose = () => {
     setIsSuccess(false);
     setSelectedFile(null);
     setError(null);
+    setUploadStats(null);
+    setActiveTab("failed");
     onClose();
   };
 
@@ -63,8 +110,13 @@ const UploadCsvModal: React.FC<UploadCsvModalProps> = ({ isOpen, onClose }) => {
       setIsSuccess(false);
 
       const result = await uploadCsv(selectedFile);
-      console.log("Upload successful:", result);
-      setIsSuccess(true);
+      setInProgress(true);
+      setIsUploading(false);
+
+      console.log("Upload result from api:", result);
+
+      // Note: We don't set isSuccess to true here anymore
+      // It will be set to true when the upload-in-progress event is received
     } catch (err) {
       console.error("Upload error:", err);
       setError(
@@ -72,7 +124,6 @@ const UploadCsvModal: React.FC<UploadCsvModalProps> = ({ isOpen, onClose }) => {
           ? err.message
           : "Failed to upload file. Please try again."
       );
-    } finally {
       setIsUploading(false);
     }
   };
@@ -102,13 +153,160 @@ const UploadCsvModal: React.FC<UploadCsvModalProps> = ({ isOpen, onClose }) => {
 
         <div className="space-y-4">
           {isSuccess ? (
-            <div className="flex flex-col items-center justify-center py-8">
+            <div className="flex flex-col items-center justify-center p-4">
               <CheckCircle className="w-12 h-12 text-green-500 mb-4" />
               <p className="text-lg font-medium text-gray-900 mb-2">
-                Upload Successful!
+                Upload Complete!
+              </p>
+              <p className="text-sm text-gray-600 text-center mb-4">
+                Your CSV file has been successfully processed and uploaded.
+              </p>
+
+              {uploadStats && (
+                <div className="w-full bg-gray-50 p-4 rounded-lg mb-4">
+                  <div className="flex justify-between mb-4">
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-green-600">
+                        {uploadStats.totalSuccess}
+                      </p>
+                      <p className="text-xs text-gray-600">Success</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-red-600">
+                        {uploadStats.totalFailed}
+                      </p>
+                      <p className="text-xs text-gray-600">Failed</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-blue-600">
+                        {uploadStats.alreadyExistEmails?.length || 0}
+                      </p>
+                      <p className="text-xs text-gray-600">Already Exist</p>
+                    </div>
+                  </div>
+
+                  {/* Tabs */}
+                  <div className="mb-4">
+                    <div className="flex border-b border-gray-200">
+                      <button
+                        className={`py-2 px-4 text-sm font-medium ${
+                          activeTab === "failed"
+                            ? "text-[#EF5157] border-b-2 border-[#EF5157]"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                        onClick={() => setActiveTab("failed")}
+                      >
+                        Failed
+                      </button>
+                      <button
+                        className={`py-2 px-4 text-sm font-medium ${
+                          activeTab === "success"
+                            ? "text-[#EF5157] border-b-2 border-[#EF5157]"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                        onClick={() => setActiveTab("success")}
+                      >
+                        Success
+                      </button>
+                      <button
+                        className={`py-2 px-4 text-sm font-medium ${
+                          activeTab === "existing"
+                            ? "text-[#EF5157] border-b-2 border-[#EF5157]"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                        onClick={() => setActiveTab("existing")}
+                      >
+                        Already Existing
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Tab Content */}
+                  <div className="mt-2">
+                    {activeTab === "failed" && (
+                      <div>
+                        <div className="max-h-40 overflow-y-auto bg-white p-2 rounded border border-gray-200">
+                          {uploadStats.failedEmails.length > 0 ? (
+                            uploadStats.failedEmails.map((email, index) => (
+                              <p
+                                key={index}
+                                className="text-xs text-red-600 py-1 border-b border-gray-100 last:border-b-0"
+                              >
+                                {email}
+                              </p>
+                            ))
+                          ) : (
+                            <p className="text-xs text-gray-500 py-2 text-center">
+                              No failed emails
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === "success" && (
+                      <div>
+                        <div className="max-h-40 overflow-y-auto bg-white p-2 rounded border border-gray-200">
+                          {uploadStats.successEmails.length > 0 ? (
+                            uploadStats.successEmails.map((email, index) => (
+                              <p
+                                key={index}
+                                className="text-xs text-green-600 py-1 border-b border-gray-100 last:border-b-0"
+                              >
+                                {email}
+                              </p>
+                            ))
+                          ) : (
+                            <p className="text-xs text-gray-500 py-2 text-center">
+                              No successful emails
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === "existing" && (
+                      <div>
+                        <div className="max-h-40 overflow-y-auto bg-white p-2 rounded border border-gray-200">
+                          {uploadStats.alreadyExistEmails.length > 0 ? (
+                            uploadStats.alreadyExistEmails.map(
+                              (email, index) => (
+                                <p
+                                  key={index}
+                                  className="text-xs text-blue-600 py-1 border-b border-gray-100 last:border-b-0"
+                                >
+                                  {email}
+                                </p>
+                              )
+                            )
+                          ) : (
+                            <p className="text-xs text-gray-500 py-2 text-center">
+                              No already existing emails
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={handleClose}
+                className="px-4 py-2 bg-[#EF5157] text-white rounded-lg hover:bg-[#d9444a] transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          ) : inProgress ? (
+            <div className="flex flex-col items-center justify-center p-4">
+              <Clock className="w-12 h-12 text-yellow-500 mb-4" />
+              <p className="text-lg font-medium text-gray-900 mb-2">
+                Upload Pending!
               </p>
               <p className="text-sm text-gray-600 text-center mb-6">
-                The CSV file has been successfully uploaded and processed.
+                CSV file upload is in progress. You'll be notified once it's
+                successfully processed.
               </p>
               <button
                 onClick={handleClose}

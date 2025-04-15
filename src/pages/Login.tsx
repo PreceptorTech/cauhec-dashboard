@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Logo from "../assets/Logo.png";
+import { initializeSocket } from "../api/socketConfig";
 
 const Login = () => {
   const navigate = useNavigate();
