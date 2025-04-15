@@ -167,13 +167,13 @@ const UploadCsvModal: React.FC<UploadCsvModalProps> = ({ isOpen, onClose }) => {
                   <div className="flex justify-between mb-4">
                     <div className="text-center">
                       <p className="text-2xl font-bold text-green-600">
-                        {uploadStats.totalSuccess}
+                        {uploadStats.successEmails?.length || 0}
                       </p>
                       <p className="text-xs text-gray-600">Success</p>
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-red-600">
-                        {uploadStats.totalFailed}
+                        {uploadStats.failedEmails?.length || 0}
                       </p>
                       <p className="text-xs text-gray-600">Failed</p>
                     </div>
